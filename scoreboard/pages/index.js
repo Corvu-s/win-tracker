@@ -4,7 +4,9 @@ import { useRouter } from "next/router";
 
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
-import { Button } from "@nextui-org/react";
+
+import { Card, Grid, Text, Divider, Button, Row } from "@nextui-org/react";
+
 export default function Home() {
   const { state, dispatch } = useAppContext();
   const router = useRouter();
@@ -27,7 +29,8 @@ export default function Home() {
   ];
   const [selectedGame, setSelectedGame] = useState(games[0]);
   const [selectedPerson, setSelectedPerson] = useState(people[0]);
-
+  const [records, setRecrods] = useState(state.records);
+  const [standings, setStandings] = useState([]);
   function GameDropdown() {
     return (
       <div className=" top-16 w-72">
@@ -48,7 +51,7 @@ export default function Home() {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Listbox.Options className=" mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {games.map((game, gameIdx) => (
                   <Listbox.Option
                     key={gameIdx}
@@ -69,7 +72,7 @@ export default function Home() {
                           {game}
                         </span>
                         {selected ? (
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                          <span className=" inset-y-0 left-0 flex items-center pl-3 text-amber-600">
                             <CheckIcon className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
@@ -105,7 +108,7 @@ export default function Home() {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Listbox.Options className=" mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                 {people.map((person, personIdx) => (
                   <Listbox.Option
                     key={personIdx}
@@ -126,7 +129,7 @@ export default function Home() {
                           {person}
                         </span>
                         {selected ? (
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                          <span className=" inset-y-0 left-0 flex items-center pl-3 text-amber-600">
                             <CheckIcon className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
@@ -142,46 +145,125 @@ export default function Home() {
     );
   }
 
-  function submitWin(){
+  async function submitWin() {
     const win = await fetch(
       `/api/SubmitWin?name=${selectedPerson}&game=${selectedGame}`,
       { method: "POST" }
     ).then((res) => res.json());
-    if(win != undefined || win != null){
-      console.log(win)
-
+    if (win != undefined || win != null) {
+      console.log(win);
     }
   }
-  function getReccords(){
-    const result = await fetch(
-      `/api/GetReccords`,
-      { method: "GET" }
-    ).then((res) => res.json());
-    if(result != undefined || result != null){
-      console.log(result)
+  async function getReccords() {
+    const result = await fetch(`/api/GetReccords`, { method: "GET" }).then(
+      (res) => res.json()
+    );
+    if (result != undefined || result != null) {
+      console.log(result);
+      setRecrods(result);
+    } else {
+      console.log("something is not happening?");
+    }
+  }
 
-    }else{
-      console.log("something is not happening?")
+  function displayRecrods() {
+    if (records != null || records != undefined) {
+      return (
+        <div>
+          {records.map((item, index) => (
+            <div key={index} className="flex space-x-2">
+              <p>{item.name}</p>
+              <p> won</p>
+              <p> {item.game}</p>
+              <p> on {item.date}</p>
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <p>No Records</p>
+        </div>
+      );
+    }
+  }
+  async function getStandings() {
+    const result = await fetch(`/api/GetStandings`, { method: "GET" }).then(
+      (res) => res.json()
+    );
+    if (result != undefined || result != null) {
+      console.log(result);
+      setStandings(result);
+    } else {
+      console.log("something is not happening?");
+    }
+  }
+  function getRank(data, index) {
+    // 0 == 1st
+    // 1 == 2nd
+    // 2 == 3rd
+    if (data[index] != undefined) {
+      if (data[index].name != undefined) {
+        return data[index].name + " " + data[index]["COUNT(id)"] + " win(s)";
+      }
+    } else {
+      return "";
+    }
+  }
+  function displayStandings() {
+    if (standings != undefined || standings != null) {
+      return (
+        <div className="flex">
+          {standings.map((item, index) => (
+            <Card css={{ mw: "330px" }} key={index}>
+              <Card.Header>
+                <Text b>{item.name}</Text>
+              </Card.Header>
+              <Divider />
+              <Card.Body css={{ py: "$10" }}>
+                <Row>
+                  <Text className="text-xl10">1st {getRank(item.data, 0)}</Text>
+                </Row>
+                <Row>
+                  <Text className="text-xl3">2nd {getRank(item.data, 1)}</Text>
+                </Row>
+                <Row>
+                  <Text className="text-xl2">3rd {getRank(item.data, 2)}</Text>
+                </Row>
+              </Card.Body>
+              <Divider />
+            </Card>
+          ))}
+        </div>
+      );
+    } else {
+      return <p>No Standings</p>;
     }
   }
   return (
     <div>
       <div>
-        <h1 className="text-7xl">Gamepad</h1>
+        <h1 className="text-7xl font-bold">Gamepad</h1>
         <p>created by Luke Linigari</p>
       </div>
       <div>
-        <p>Choose a game and a winner</p>
+        <p className="text-xl font-semibold">Choose a game and a winner</p>
         <div className="flex">
           {GameDropdown()}
           {PeopleDropdown()}
-          <Button onClick={()=>submitWin()}>Submit</Button>
+          <Button onPress={() => submitWin()}>Submit</Button>
         </div>
       </div>
       <div>
-        <p>player records</p>
-        <Button onClick={()=>getReccords()}>Get Reccords</Button>
-
+        <p className="text-xl font-semibold">player records</p>
+        <Button onPress={() => getReccords()}>Get Reccords</Button>
+        {displayRecrods()}
+      </div>
+      <div>
+        <p className="text-xl font-semibold">Game Standings</p>
+        <Button onPress={() => getStandings()}>Get Standings</Button>
+        {displayStandings()}
       </div>
     </div>
   );
