@@ -214,7 +214,7 @@ export default function Home() {
   function displayStandings() {
     if (standings != undefined || standings != null) {
       return (
-        <div className="flex">
+        <div className="flex flex-wrap">
           {standings.map((item, index) => (
             <Card css={{ mw: "330px" }} key={index}>
               <Card.Header>
