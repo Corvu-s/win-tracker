@@ -151,7 +151,7 @@ export default function Home() {
       { method: "POST" }
     ).then((res) => res.json());
     if (win != undefined || win != null) {
-      console.log(win);
+      //console.log(win);
     }
   }
   async function getReccords() {
@@ -159,23 +159,36 @@ export default function Home() {
       (res) => res.json()
     );
     if (result != undefined || result != null) {
-      console.log(result);
+      //console.log(result);
       setRecrods(result);
     } else {
       console.log("something is not happening?");
     }
   }
+  function getDate(date) {
+    //removes alot of the extra time info
+    let pos = date.indexOf("T");
+    let formattedDate = date.substring(0, pos);
+    //console.log(formattedDate);
 
+    return formattedDate;
+  }
+  function getNameColour(name) {
+    //returns the proper colour code for the record
+  }
+  function getGameColour(game) {
+    //returns the proper colour code for the record
+  }
   function displayRecrods() {
     if (records != null || records != undefined) {
       return (
         <div>
           {records.map((item, index) => (
             <div key={index} className="flex space-x-2">
-              <p>{item.name}</p>
+              <p className="font-bold">{item.name}</p>
               <p> won</p>
-              <p> {item.game}</p>
-              <p> on {item.date}</p>
+              <p className="font-bold"> {item.game}</p>
+              <p> on {getDate(item.date)}</p>
             </div>
           ))}
         </div>
@@ -193,7 +206,7 @@ export default function Home() {
       (res) => res.json()
     );
     if (result != undefined || result != null) {
-      console.log(result);
+      //console.log(result);
       setStandings(result);
     } else {
       console.log("something is not happening?");
