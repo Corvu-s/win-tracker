@@ -224,6 +224,10 @@ export default function Home() {
       return "";
     }
   }
+  function handleGameClick(game) {
+    console.log(game);
+    router.push(`/GameDetails?game=${game}`);
+  }
   function displayStandings() {
     if (standings != undefined || standings != null) {
       return (
@@ -243,6 +247,11 @@ export default function Home() {
                 </Row>
                 <Row>
                   <Text className="text-xl2">3rd {getRank(item.data, 2)}</Text>
+                </Row>
+                <Row>
+                  <Button onClick={() => handleGameClick(item.name)}>
+                    Details
+                  </Button>
                 </Row>
               </Card.Body>
               <Divider />
@@ -265,18 +274,20 @@ export default function Home() {
         <div className="flex">
           {GameDropdown()}
           {PeopleDropdown()}
-          <Button onPress={() => submitWin()}>Submit</Button>
+          <Button size={"sm"} onPress={() => submitWin()}>
+            Submit
+          </Button>
         </div>
-      </div>
-      <div>
-        <p className="text-xl font-semibold">player records</p>
-        <Button onPress={() => getReccords()}>Get Reccords</Button>
-        {displayRecrods()}
       </div>
       <div>
         <p className="text-xl font-semibold">Game Standings</p>
         <Button onPress={() => getStandings()}>Get Standings</Button>
         {displayStandings()}
+      </div>
+      <div>
+        <p className="text-xl font-semibold">player records</p>
+        <Button onPress={() => getReccords()}>Get Reccords</Button>
+        {displayRecrods()}
       </div>
     </div>
   );

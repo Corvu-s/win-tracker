@@ -1,20 +1,23 @@
 import { React } from "react";
 import { useRouter } from "next/router";
 import { useAppContext } from "../state/AppContext";
+import { Card, Grid, Text, Divider, Button, Row } from "@nextui-org/react";
 
-export default function GameDetails({ gameTitle }) {
-  console.log(gameTitle);
+export default function GameDetails({ data }) {
+  const router = useRouter();
   return (
     <div>
-      <p>Game Details for {gameTitle}</p>
+      <Button onPress={() => router.push("/")}>Back</Button>
+      <p>Game Details for {data.gameName}</p>
     </div>
   );
 }
 
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   const { game } = context.query;
 
+  const data = { gameName: game };
   return {
-    props: { gameTitle: game }, // will be passed to the page component as props
+    props: { data }, // will be passed to the page component as props
   };
 }
